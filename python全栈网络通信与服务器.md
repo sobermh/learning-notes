@@ -182,8 +182,7 @@ from socket import *
     #6.关闭套接字
     listenSocket.close()#表示关闭一个服务器的服务，accept（）停止服务
 
-### 多任务服务端
-#### 线程的基本知识
+# 线程的基本知识
     并行：真的多任务
     并发：假的多任务
 一个程序运行起来之后，一定有一个执行代码的东西，这个东西就称之为线程
@@ -193,12 +192,169 @@ from socket import *
 
     1. #创建实例对象和线程
     import threading
-    t2 = threading.Thread(target=函数名)#只是创建了实例对象，没有创建线程
+    t2 = threading.Thread(target=函数名,args=(X))#只是创建了实例对象，没有创建线程
     t2.start()#创建了线程，并启动线程,开始执行
         length=len(threading.enumerate())
         print('当前运行的线程数为：%d'%length)
     2.创建一个类继承threading.Thread的run（self）方法。t=类名（）  t.start（）
-#### 多线程共享全局变量
+## 多线程共享全局变量
     global
     在一个函数中，对全局变量进行修改的时候，到底是否需要使用global进行说明，要看是否对全局变量的指向进行了修改。
     如果修改了执行，即让全局变量指向了一个新的地方，那么必须使用global。如果，仅仅是修改了指向的空间中的数据，此时不用必须使用global。
+    可能遇到的问题：
+        资源竞争，因为cpu处理多线程是没有先后顺序的，第一个线程未进行完成，可能就结束一次执行。然后直接开始第二个线程的执行。数据越大，出现问题的可能性越大。
+    同步：按预定的先后次序进行运行。
+## 互斥锁
+        解决多线程共享全局变量可能遇到的问题
+        某个线程要更改共享数据时，先将其锁定，此时资源的状态为”锁定”，其他线程不能更改；直到该线程释放资源，将资源的状态变成“非锁定”，其他的线程才能再次锁定该资源。互斥锁保证了每次只有一个线程进行写入操作。从而保证了多线程情况下数据的正确性。
+    创建锁：mutex=threading.lock（）
+    锁定：mutex.acquire（）如果之前没有被上锁，那么上锁成功
+                        如果之前被上锁，堵塞在此，直到这个锁被解开
+    释放：mutex.release()
+## 死锁
+a锁等b锁释放才能继续执行，b锁等a锁释放才能继续执行。a锁进程中有b锁，b锁进程中有a锁
+避免死锁
+    银行家算法
+    添加超时时间
+## 线程多任务版udp聊天器
+import threading
+from socket import *
+
+def recv_msg(udp_socket):
+    """接收数据并显示"""
+    while True:
+        recv_data = udp_socket.recvfrom(1024)
+        print(recv_data)
+
+def send_msg(udp_socket,dest_ip,dest_port):
+    """发送数据"""
+    while True:
+        send_data = input(">>>")
+        udp_socket.sendto(send_data.encode("utf-8"), (dest_ip, dest_port))
+
+def main():
+    """完成udp聊天器的整体控制"""
+    # 1.创建套接字
+    udp_socket = socket(AF_INET, SOCK_DGRAM)
+    # 2.绑定本地信息
+    ip = ""
+    port = 8888 # 本机调试时，收发数据端口保持不一致
+    udp_socket.bind((ip, port))
+    # 3.获取对方的ip
+    dest_ip = input(">>>ip")
+    dest_port = int(input(">>>port"))
+    # 4.创建两个线程，去执行相应的功能
+    t_recv = threading.Thread(target=recv_msg, args=(udp_socket,))
+    t_send = threading.Thread(target=send_msg, args=(udp_socket,dest_ip,dest_port))
+    t_recv.start()
+    t_send.start()
+if __name__ == "__main__":
+    main()
+
+# 进程、程序的概念
+    未运行的为程序，运行的为进程
+    一个程序可以有多个进程
+进程:操作系统分配资源的基本单元（使用进程实现多任务）
+进程的状态：新建、就绪、等待（堵塞）、运行、死亡
+import time
+import multiprocessing
+
+def sing():
+    """唱歌5秒钟"""
+    for i in range(5):
+        print("---正在唱---")
+        time.sleep(1)
+
+def dance():
+    """跳舞5秒钟"""
+    for i in range(5):
+        print("---dance---")
+        time.sleep(1)
+
+def main():
+    #创建实例对象
+    p1=multiprocessing.Process(target=sing)
+    p2=multiprocessing.Process(target=dance)
+    p1.start()
+    p2.start()
+
+if __name__ == "__main__":
+    main()
+## 进程和线程的区别：
+    一个进程里至少有一个主线程
+    线程依赖于进程
+    进程是资源分配单位
+    线程是操作系统调度单位
+## 多进程通过queue实现数据共享
+import multiprocessing
+
+def download_from_web(q):
+    """下载数据"""
+    #模拟从网上下载的数据
+    data=[11,22,33,44]
+    #向队列中写入数据
+    for temp in data:
+        q.put(temp)
+    print("已完成下载，并存入队列")
+def analysis_data(q):
+    """数据处理"""
+    waitting_analysis=list()
+    #从队列获取数据
+    while True:
+        data=q.get()
+        waitting_analysis.append(data)
+        if q.empty():
+            break
+    #模拟数据处理
+    print(waitting_analysis)
+def main():
+    #1.创建一个队列
+    q=multiprocessing.Queue()
+    #2.创建多个进程，将队列的引用当做实参进行传递到里面
+    p1=multiprocessing.Process(target=download_from_web,args=(q,))
+    p2=multiprocessing.Process(target=analysis_data,args=(q,))
+    p1.start()
+    p2.start()
+if __name__ =="__main__":
+    main()
+## 进程池
+    任务数不确认且数据多时，需要用进程池pool
+    初始化pool时，可以指定一个最大进程数，当有新的请求提交到pool时，如果pool还没有满，那么就会新建一个新的进程用来执行该请求；但如果池中的进程数已经达到指定的最大值，那么该请求就会等待，直到pool中有进程结束，才会用之前的进程（进程号一致）来执行新的任务。
+    po=multiprocessting.pool(5)创建进程池
+    po.apply_async(***)向进程池添加任务
+    po.close()
+    po.join()作用是等待进程池中的任务做完
+    在进程池中需要创建队列的话：    
+                q=multiprocessing.manager().queue()
+# 多任务-协程
+## 迭代器
+    from collections import iterable
+    isinstance（xxx，iterable） 返回true的话是可迭代对象，false不可迭代
+
+    自己定义的类生成的实例对象，可以使用for循环：
+    class Classmate(object):
+        def __init__(self):
+            self.names=list()
+            self.current_num=0
+            """有这两个方法，就是迭代器"""
+        def add(self):
+            pass
+        def __iter__(self):
+            """如果想要一个对象成为一个可迭代对象，那么必须使用__iter__方法""""
+            return self            
+        def __next__(self):#返回什么那么迭代的就是什么
+            if self.current_num < len(self.names) :
+                ret=self.obj.names[self.curremt_num]
+                self.current_num+=1
+                return ret
+            else:
+                raise StopIteration
+
+    classmate=Classmate()#生成实例对象
+    #是否为可迭代对象
+    isinstance（classmate，iterable）
+    #是否为迭代器
+    isinstance(classmate,iterator)
+### 优点：占用极小的内存空间，存储的是生成的对象
+## 生成器
+nums=[x*2 for x in range(10)]    约等于  nums=(x*2 for x in range(10))
