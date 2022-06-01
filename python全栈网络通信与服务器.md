@@ -373,7 +373,7 @@ pip install gevent
 6.多进程、多线程根据cpu核数不一样可能是并行的，但是协程是在一个线程中，一定是并发的。
 # 正则表达式
 import re#导包
-result=re.match（正则表达式，要匹配的字符串）#匹配
+result=re.match（正则表达式，要匹配的字符串）#匹配//match默认只能判断以谁开头，不能判断结尾
 result.group()#提取
 ## 匹配单个字符
 \d：0-9
@@ -394,3 +394,41 @@ result.group()#提取
 ?:?前面的可以有或者没有（仅一次）
 *：任意个
 +：任意个（不能没有）
+$:增加判断结尾，判断所有字符串
+^：增加判断开头，
+|：匹配任意左边和右边（group(1)取第1个括号的东西）
+## 案例
+    email=input(">>>")##邮箱地址
+    #如果在正则表达式中需要用到某些特殊的字符，如：. ? 等，需要在他们前面添加一个反斜杠进行转义
+    ret=re.match(r"^[a-zA-Z_0-9]{4,20}@163\.com$",email)
+    if ret:
+        print("%s符合要求"%email)
+    else:
+        print("%s不符合要求" % email)
+    #将后面的匹配保存与前面的一致（在分组前面可以加？P<取名>）
+re.match(r"<(\w*)>.*<\1>",html).group()
+re.match(r"<(？P<p1>\w*)>.*</?P<p1>>",html).group()
+## re模块的高级用法
+    re.search：不从头开始
+    re.findall：直接返回，不用group（）
+    re.sub():替换
+    <!-- re.split()切割 -->
+# http协议
+浏览器-->服务器（request）
+    get / http/1.1
+    host：请求的目标
+    connection：长/短连接
+    accept：浏览器接收什么形式内容
+    user-agent：客户端浏览器版本
+    accept-encoding：浏览器接收的压缩格式
+    accept——language：
+    ......
+服务器-->浏览器（response）
+    http/1.1 200 ok
+    head body差一行
+## tcp3次握手
+    c---->s(syn11)
+    s---->c(ack12、syn44)
+    c----->s(ack45)
+## tcp4次挥手
+    
