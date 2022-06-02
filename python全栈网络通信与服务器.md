@@ -274,7 +274,7 @@ def dance():
 def main():
     #创建实例对象
     p1=multiprocessing.Process(target=sing)
-    p2=multiprocessing.Process(target=dance)
+    p2=multiprocessing.Process(target=dance，args=（）)
     p1.start()
     p2.start()
 
@@ -364,6 +364,9 @@ send一般不会放到第一次启动生成器，如果非要这样做，那么�
 ## 使用yield完成多任务
 ## 使用gevent完成多任务
 pip install gevent
+from gevent import monkey
+monkey.patch_all()
+gevent.spawn()
 # 进程、线程、协程对比
 1.进程是资源分配的单位
 2.线程是操作系统调度的单位
@@ -425,10 +428,64 @@ re.match(r"<(？P<p1>\w*)>.*</?P<p1>>",html).group()
     ......
 服务器-->浏览器（response）
     http/1.1 200 ok
-    head body差一行
+    head body（之间空一行）
 ## tcp3次握手
     c---->s(syn11)
     s---->c(ack12、syn44)
     c----->s(ack45)
 ## tcp4次挥手
     
+
+# 单进程、线程，非堵塞
+tcp_server.setblocking(false) 设置套接字为非堵塞的方式
+from socket import *
+
+tcp_server=socket(AF_INET,SOCK_STREAM)
+tcp_server.bind(("",7899))
+tcp_server.listen(128)
+tcp_server.setblocking(False)
+
+client_socket_list=list()
+
+while True:
+    try:
+        new_socket,new_addr=tcp_server.accept()
+    except Exception as e:
+        print("没有新的客户端到到来")
+    else:
+        print("到来一个新的客户端")
+        new_socket.setblocking(False)
+        client_socket_list.append(new_socket)
+
+    for client_socket in client_socket_list:
+        try:
+            recv_data=client_socket.recv(1024)
+        except Exception as e:
+            print(e)
+            print("没有收到数据")
+        else:
+            print(recv_data)
+            if recv_data:
+                print("客户端发来了数据")
+            else :
+                client_socket.close()
+                client_socket_list.remove(client_socket)
+# epoll的原理过程讲解
+# tcp-ip简介
+应用层
+传输层
+网络层
+链路层
+# osi简介
+应用层
+表示层
+会话层
+传输层
+网络层
+数据链路层
+物理层
+# 浏览器访问服务器过程
+1.解析域名（dns服务器）
+2.向服务器发送tcp的3次握手
+3.发送http的请求数据以及等待服务器的应答
+4.发送tcp的4次握手
