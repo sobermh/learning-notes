@@ -528,3 +528,40 @@ POST:数据更安全，不会体现在URL中，在请求体中。
     查可以没有commit，增、删、改必须要有commit，不然数据库中的数据不会发生改变
     不要用python的字符串格式化进行拼接（会被sql注入），要用execute+参数
 # flask+mysql
+
+# django
+## django的安装
+    pip install django
+## 创建项目
+    (1)终端django admin startproject 项目名称（推荐）
+    (2)pycharm专业版，直接创建，项目的目录不要放在python的安装目录
+## 默认文件介绍
+项目名
+----manage.py         (项目的管理，启动项目，创建app、数据管理)
+----项目名文件夹
+    ----_init__.py
+    ----asgi.py       （接收网络请求）
+    ----settings.py   （项目配置）
+    ----urls.py       （url和函数的对应关系）
+    ----wsgi.py       （接收网络请求）
+## app的创建和说明
+创建：python manage.py startapp app名
+app名
+----migrations          （数据库变更记录）
+    ----__init__.py
+----__init__.py
+----admin.py            （django默认提供了admin后台管理）
+----apps.py             （app启动类）
+----models.py           （对数据库操作）
+----tests.py             (单元测试)
+----views.py            （函数）
+## 快速上手
+1.确保app已注册（settings.py）'app名.apps.App01Config'
+2.编写url和视图函数对应关系（urls.py）from appname import views
+3.编写试图函数（views.py） from django.shortcuts import render,HttpResponse(request)
+4.启动django项目
+    （1） python manage.py runserver
+     (2)直接运行
+## 静态文件
+1.templates存入html文件
+2.static存入图片、css、js、plugins
