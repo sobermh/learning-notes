@@ -37,7 +37,46 @@ Docker Hub默认是国外的
 查看系统的版本：
 cat /etc/os-release
 
+查看官方文档：一步一步的安装
+
+查看是否安装成功： sudo docker version  
+
+验证是否成功运行：sudo docker run hello-world
+
+查看镜像列表：sudo docker images
+
+docker默认工作路径：/var/lib/docker 
+
+## 配置阿里云镜像加速
+去阿里云找容器镜像服务
+sudo mkdir -p /etc/docker
+
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://v9gy47ph.mirror.aliyuncs.com"]
+}
+EOF
+
+sudo systemctl daemon-reload
+
+sudo systemctl restart docker
+
+## 回顾run--->HelloWorld工作流程流程
+![](./assets/1657010426741.jpg)
+## 底层原理
+docker是一个client、server结构的系统，docker的守护进程运行在主机上，通过socket从客户端访问
+![](./assets/企业微信截图_1657010696418.png)
+### docker为什么比vm快
+1.docker有着比虚拟机更少的抽象层
+
+2.docker利用的是宿主机的内核，vm需要时guest os
+
+![](./assets/企业微信截图_16570109107024.png)
+所以说，新建一个容器的时候，docker不需要像虚拟机一样重新加载一个操作系统内核，避免引导。虚拟机时加载guest os，分钟级别；而docker是利用宿主机的操作系统，省略了这个复杂的过程，秒级！
+
 # Docker命令
+## 帮助命令
+
 ## 镜像命令
 ## 容器命令
 ## 操作命令
