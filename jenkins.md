@@ -61,7 +61,7 @@ jenkins是通过文件形式来存储和管理数据的。所以，在安装jenk
 3.输入执行命令：python all.py
 
 4.执行grovy脚本: System setProperty("hudson.model.DirectoryBroserSupport.CSP","")
-（不会丢失样式）
+（不会丢失html样式，但是jenkins重启就没有了）
 
 
 ## 配置git
@@ -70,13 +70,18 @@ Failed to connect to repository : Command "git.exe ls-remote -h -- https://githu
 stdout:
 stderr: fatal: unable to access 'https://github.com/sobermh/database_request_pytest.git/': OpenSSL SSL_read: Connection was reset, errno 10054
 
-用户凭证不对
+可能是：用户凭证不对，注意分支要一致。有的可能是main，有的是master。
 ## 集成Allure报告
 1.安装allure插件 Allure Jenkins Plugin
 
 2.在【全局工具配置】，配置allure
 
-3.在job配置allure报告
+3.在job配置allure报告:注意！！！！json等文件生成的路径和最后报告查看的路径，不能一样。report路径最好不要变allure-report；result路径是生成json文件的路径。
+
+## 展示html测试报告
+1.安装插件  HTML Publisher
+
+2.
 
 ## 企业微信实战
 1.创建企业微信群管理机器人，获得webhook
@@ -89,11 +94,11 @@ stderr: fatal: unable to access 'https://github.com/sobermh/database_request_pyt
 
 
 ## 集成电子邮件通知
-1.安装插件： Email...
+1.安装插件： extend Email...
 
 2.新建一个邮箱：如163，打开POP3和smtp，获得客户端密码
 
-3.在【系统配置】配置邮件的发件人，SMTP服务器，收件人信息。（多个收件人用逗号隔开）
+3.在【系统配置】配置邮件的发件人（系统管理员）（只有一个发件人），SMTP服务器，收件人信息。（多个收件人用逗号隔开）
 
 4.进入job，添加构建后操作，配置邮件通知
 
@@ -114,3 +119,10 @@ Build periodically
 
 一周内每2天执行，20点执行一次
 0 20 * * * /2
+
+
+## 运行python脚本
+Build-add构建步骤：
+
+默认的路径在工作路径下。
+
