@@ -7,10 +7,6 @@
 
 
 
-
-
-
-
 # jenkins
 jenkins是一个开源软件项目，是基于java开发的一种持续集成工具，用户监控持续重复的工作，旨在提供一个开放易用的软件平台，使软件的持续集成变成可能
 ## jenkins安装
@@ -60,7 +56,7 @@ jenkins是通过文件形式来存储和管理数据的。所以，在安装jenk
 
 3.输入执行命令：python all.py
 
-4.执行grovy脚本: System setProperty("hudson.model.DirectoryBroserSupport.CSP","")
+4.执行grovy脚本: System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "")
 （不会丢失html样式，但是jenkins重启就没有了）
 
 
@@ -81,8 +77,9 @@ stderr: fatal: unable to access 'https://github.com/sobermh/database_request_pyt
 ## 展示html测试报告
 1.安装插件  HTML Publisher
 
-2.
-
+2.下载groovy插件，在项目配置中的build下，点击Add build step，选择groovy选项Execute system Groovy script
+System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "")
+3.脚本输入：System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "")
 ## 企业微信实战
 1.创建企业微信群管理机器人，获得webhook
 
@@ -94,7 +91,8 @@ stderr: fatal: unable to access 'https://github.com/sobermh/database_request_pyt
 
 
 ## 集成电子邮件通知
-1.安装插件： extend Email...
+![](./assets/1657246569370.jpg)
+1.安装插件：  Email  extension...
 
 2.新建一个邮箱：如163，打开POP3和smtp，获得客户端密码
 
@@ -126,3 +124,4 @@ Build-add构建步骤：
 
 默认的路径在工作路径下。
 
+# jenkins pipeline
