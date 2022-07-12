@@ -39,6 +39,8 @@ cat /etc/os-release
 
 查看官方文档：一步一步的安装
 
+systemctl restart docker
+
 查看是否安装成功： sudo docker version  
 
 验证是否成功运行：sudo docker run hello-world
@@ -46,9 +48,17 @@ cat /etc/os-release
 查看镜像列表：sudo docker images
 
 docker默认工作路径：/var/lib/docker 
+## 测试命令
+```
+docker version
+docker run hello-world
+```
+#卸载
+`查看官网`
 
 ## 配置阿里云镜像加速
 去阿里云找容器镜像服务
+```
 sudo mkdir -p /etc/docker
 
 sudo tee /etc/docker/daemon.json <<-'EOF'
@@ -60,7 +70,7 @@ EOF
 sudo systemctl daemon-reload
 
 sudo systemctl restart docker
-
+```
 ## 回顾run--->HelloWorld工作流程流程
 ![](./assets/1657010426741.jpg)
 ## 底层原理
@@ -378,10 +388,122 @@ son --volume-from father(只备份容器的数据卷，任何容器没有，都�
 
 4.docker push 发布镜像（dockerhub/阿里云镜像仓库）
 ## 基础知识：
-1.每个保留关键字
+1.每个保留关键字(指令)都是必须大写字母
+2.执行从上到下顺序执行
+3.#表示注释
+4.每一个指令都会创建提交一个新的镜像层，并提交
+![](./assets/企业微信截图_16575308686642.png)
+- dockerfile:构建文件，定义了一切的步骤，源代码
+- dockersimages：通过dockerfile构建生成的镜像，最终发布和运行的产品
+- docker容器：容器就是镜像运行起来提供服务器
+## dockerfile的指令
+```bash
+FROM             #基础镜像，一切从这里开始
+MAINTAINER       #镜像是谁写的，姓名—+邮件
+RUN              #镜像构建的时候需要运行的命令
+ADD              #步骤，这个tomcat压缩包！添加内容
+WORKDIR          #镜像的工作目录
+VOLUME           #挂载的目录
+EXPOSE           #指定暴露端口配置 等于-P
+CMD              #指定这个容器启动的时候要运行的命令，只有最后一个会生效，可被替代
+ENTRYPOINT       #指定这个容器启动的时候要运行的命令，可以追加命令
+ONBUILD          #当构建一个被继承dockerfile  这个时候就会运行ONBUILD的指令，触发指令
+COPY             #类似add，将我们的文件拷贝到镜像中
+ENV              #构建的时候设置环境变量
+```
+![](./assets/企业微信截图_1657588166734.png)
+## 实战：自己的centos
+1.编写一个dockerfile文件
+```bash
+root@aliyun:/home/dockerfile# cat dockerfile-centos 
+FROM centos:7
+MAINTAINER maohui<409788696@qq.com>
+
+ENV MYPATH /usr/local
+WORKDIR   $MYPATH
+
+RUN yum -y install vim
+RUN yum -y install net-tools
+
+EXPOSE 80
+
+CMD echo $MYPATH
+CMD echo "-------end------"
+CMD /bin/bash
+
+````
+2. 通过这个文件构建镜像
+命令 dokcer build -f dockerfile文件路径 -t 镜像名：[tag]
+```
+docker build -f dockerfile-centos -t mycentos:0.1 .
+```
+3. 测试运行
+起始工作路径变为/usr/local
+
+## CMD和ENTRYPOINT的区别
+- cmd 
+1. 构建一个dockerfile其中cmd命令为CMD ["ls","-a"]
+2. build这个dockerfile，别忘了后面的点
+3. run新建的image后面加-l，显示错误，因为不能叠加为ls -al，只会覆盖；需要加为ls -al，
+- ENTRYPOINT
+而entrypoint可以叠加，不会覆盖。
+## 实战：tomcat镜像
+![](./assets/1657591683947.jpg)
+![](./assets/1657591763419.jpg)
+## 发布自己的镜像(Dockerhub)
+1. Dockerhub，注册自己的张海,https://hub.docker.com/
+2. 确定可以登录
+3. 登录
+```bash
+root@aliyun:/home/dockerfile# docker login -u maowansen
+Password: 
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+
+```
+4. 新建一个新标签镜像，带用户名
+```
+docker tag a7d16844cab7 maowansen/mycentos:1.0
+```
+5. 
+```
+docker push maowansen/mycentos:1.0
+```
+## 发布镜像（阿里云）
+1. 登录阿里云
+2. 找到容器镜像服务
+3. 创建命名空间
+![](./assets/1657593786196.jpg)
+4. 创建容器镜像
+![](./assets/1657593921521.jpg)
+5.浏览aliyun
+```
+docker login --username=maohui registry.cn-hangzhou.aliyuncs.com
+```
+
+```
+docker tag a7d16844cab7 registry.cn-hangzhou.aliyuncs.com/maowansen/maowanseng-test:1.0
+```
+
+```
+docker push registry.cn-hangzhou.aliyuncs.com/maowansen/maowanseng-test:1.0
+```
+`详细查看阿里云的操作说明`
+# docker所有流程小结
+![](./assets/1657594839365.jpg) 
 # Docker网络原理
+![](./assets/1657596067402.jpg)
+每启动一个docker容器，docker就会给docker容器分配一个ip，我们只要启动了docker，就会有一个网卡dokcer0桥接模式，使用的是veth—pair技术！
+
+veth-pair就是一对虚拟设备接口，他们都是成对出现的，一端连着协议，一端彼此连接；正因为这个特性，veth-pair充当一个桥梁，连接各种虚拟网络设备的；openstac，docker容器之间的连接，ovs的连接，都是使用veth-pair技术。
+![](./assets/1657597203923.jpg)
+![](./assets/1657597305135.jpg)
 # IDEA 整合Docker 
 # Docker Compose
+
 # Dcoker Swarm
 # CI\CD Jenkins
 
