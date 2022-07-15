@@ -503,6 +503,37 @@ veth-pair就是一对虚拟设备接口，他们都是成对出现的，一端�
 ![](./assets/1657597305135.jpg)
 # IDEA 整合Docker 
 # Docker Compose
+查看官方文档：https://docs.docker.com/compose/gettingstarted/
+
+1. 应用app.py
+2. dockerfile 应用打包为镜像
+3. docker-compose.yml文件（定义整个服务，需要的环境，web，redis）完整的上线服务
+4. 启动compose项目
+
+`流程`
+- 创建网络
+- 执行docker-compose yml文件
+- 启动服务
+## yaml规则
+```
+version: '' #版本
+service: #服务
+  服务1： web
+    images
+    build
+    network...
+  服务2： 
+  服务3：
+#其他配置 网络/卷、全局规则
+volumes:
+networks:
+configs:
+```
+# 小结
+- docker镜像。run=》容器
+- dockerfile 构建镜像（服务打包）
+- docker compose 启动项目（编排/多个微服务/环境）
+- dockers网络
 
 # Dcoker Swarm
 # CI\CD Jenkins
