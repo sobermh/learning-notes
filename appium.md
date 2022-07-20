@@ -1,4 +1,7 @@
 # 环境搭建
+## 安装nodejs
+http://nodejs.cn/
+因为appium这个工具的服务端是由nodejs语言开发的
 ## 安装JDK
 1. 安装下载JDK，配置环境变量JAVA_HOME,变量值填写jdk安装目录
 ![](https://maowansen.oss-cn-hangzhou.aliyuncs.com/img/20220718113923.png)
@@ -32,7 +35,7 @@ Installed as E:\sdk\platform-tools\adb.exe
 ## 真机授权
 1. 手机打开开发者模式，勾选usb调试
 2. cmd输入adb devices -l，查看是否有连接电脑的手机
-
+3. 关闭小米的usb安装提示`发者选项中 -> 启动MIUI优化 ->关闭——我只操作了这个，就可以了。`
 ## 安装python第三方库
 pip install appium-python-client
 # adb
@@ -89,4 +92,55 @@ adb push 电脑文件的路径 手机文件夹的路径
 注意： 
 -  小米手机插卡才可以实现usb调试权限的启动，使用安装之后，就可以把卡取走了。
 - #解决微信登录，清空之前的记录的问题，必须加上"noReset": true,这一参数。
-# 运行python项目
+## 注意
+`新版的appiumserver和inspector是分开的，需要单独下载，且需要加一个参数`
+![](https://maowansen.oss-cn-hangzhou.aliyuncs.com/img/20220719164944.png)
+# 元素的定位
+- uiautomatorviewer，android自带的工具，在sdk/tools下（java8及以下，android 8.0以上不支持截屏）
+- Weditor 
+  1. python-uiautomator2，pip install --pre -U uiautomator2
+  2. python -m uiautomator2 init
+  3. pip install weditor
+  确认安装：cmd-  weditor --help
+- appium自带的
+## `Html5 webview元素定位工具的实现`
+- chrome://inspect/#devices 需要fq
+- '下载使用'https://dev.ucweb.com/ uc开发者工具
+  1. 需要在C:\Program Files\Appium Server GUI\resources\app\node_modules\appium\node_modules\appium-chromedriver\chromedriver\win加上一个与chrome内核相匹配的chromedriver,`打开公众号和打开小程序的chromedirver的版本可能是不同的，这样会导致，必须保证chrome版本都一样，才能实现一起运行。`
+  2. 
+## appium
+
+`注意`：
+- 重复执行测试用例
+  1. pip install pytest -repeat
+  2. 方法一：使用注解方式，实现重复执行单条用例
+  在测试用例前添加注解@pytest.mark.repeat(value)，value表示重复的次数，来实现单条用例的重复执行。
+  ```python
+   @pytest.mark.repeat(2)
+  ```
+  3. 方法二：使用命令函参数，实现重复执行所有用例
+  在终端传入-count的方式实现重复执行测试用例
+  ```
+  # 在终端(terminal)输入：
+  pytest -s -v --count=2 test_Pytest.py
+  ```
+  -s：表示输出用例中的调式信息，比如print的打印信息等。
+- 失败用例重跑
+  1. pip install pytest-rerunfailures
+  2.方法一：通过注解的形式实现失败重运行
+  ```python
+   # 用例失败后重新运行2次，重运行之间的间隔时间为10s
+    @pytest.mark.flaky(reruns=2, reruns_delay=10)
+  ```
+  3. 方法二：通过使用命令行参数，实现失败重运行
+  ```shell
+  # 用例失败后重新运行2次，重运行之间的间隔时间为10s
+  # 在终端(terminal)输入：
+  pytest -s -v --reruns=2 --reruns-delay=10 test.py
+  ```
+  4. 重复执行测试用例直到失败停止
+  ```
+  # 重复运行5次，运行过程中第一次失败时就停止运行
+  # 在终端(terminal)输入：
+  pytest -s -v --count=5 -x test.py
+  ```
