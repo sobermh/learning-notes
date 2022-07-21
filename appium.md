@@ -106,7 +106,7 @@ adb push 电脑文件的路径 手机文件夹的路径
 ## `Html5 webview元素定位工具的实现`
 - chrome://inspect/#devices 需要fq
 - '下载使用'https://dev.ucweb.com/ uc开发者工具
-  1. 需要在C:\Program Files\Appium Server GUI\resources\app\node_modules\appium\node_modules\appium-chromedriver\chromedriver\win加上一个与chrome内核相匹配的chromedriver,`打开公众号和打开小程序的chromedirver的版本可能是不同的，这样会导致，必须保证chrome版本都一样，才能实现一起运行。`
+  1. 需要在C:\Program Files\Appium Server GUI\resources\app\node_modules\appium\node_modules\appium-chromedriver\chromedriver\win加上一个与chrome内核相匹配的chromedriver,`打开公众号和打开小程序的chromedirver的版本可能是不同的，这样会导致打开h5页面和小程序不能同时进行。必须保证chrome版本都一样，才能实现一起运行。有的时候会抽风`
   2. 
 ## appium
 
@@ -125,7 +125,7 @@ adb push 电脑文件的路径 手机文件夹的路径
   pytest -s -v --count=2 test_Pytest.py
   ```
   -s：表示输出用例中的调式信息，比如print的打印信息等。
-- 失败用例重跑
+- 失败用例重跑`（不知道为什么第二次试的时候直接报错，解决办法先搁置了）`
   1. pip install pytest-rerunfailures
   2.方法一：通过注解的形式实现失败重运行
   ```python
@@ -144,3 +144,5 @@ adb push 电脑文件的路径 手机文件夹的路径
   # 在终端(terminal)输入：
   pytest -s -v --count=5 -x test.py
   ```
+- Appium Error: Cannot find any free port in range 8200..8299
+  解决办法：adb forward --remove-all 
