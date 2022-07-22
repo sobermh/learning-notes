@@ -72,6 +72,14 @@ C:\Users\PC>adb shell dumpsys activity | findstr "mResume"
 adb push 电脑文件的路径 手机文件夹的路径
 
 # appium
+## appium连接虚拟机
+1. adb connect 127.0.0.1:62001
+2.  `查看包名和界面名`
+```
+C:\Users\PC>adb shell dumpsys activity | findstr "mResume"
+    mResumedActivity: ActivityRecord{d162fe2 u0 com.tencent.mm/.ui.LauncherUI t88}
+```
+3. 
 ## appium启动app
 1. 电脑打开appium，点击start Server
 2. 出现如下页面，再点击“Start Inspector Session”按钮
@@ -144,5 +152,34 @@ adb push 电脑文件的路径 手机文件夹的路径
   # 在终端(terminal)输入：
   pytest -s -v --count=5 -x test.py
   ```
-- Appium Error: Cannot find any free port in range 8200..8299
+- `Appium Error: Cannot find any free port in range 8200..8299`
   解决办法：adb forward --remove-all 
+
+  # 微信小程序
+  ## 获取小程序所在的进程
+  1. adb连接手机后，进入微信小程序
+  2. 获取进程号
+  ```shell
+  C:\Users\PC>adb shell dumpsys activity top|findstr ACTIVITY
+  ACTIVITY com.miui.securityadd/com.miui.gamebooster.GameBoosterRichWebActivity acc433a pid=(not running)
+  ACTIVITY com.android.systemui/.recents.RecentsActivity 8ea38b9 pid=1893
+  ACTIVITY com.android.settings/.SubSettings 2b1faad pid=(not running)
+  ACTIVITY com.miui.home/.launcher.Launcher f3b863 pid=(not running)
+  ACTIVITY com.tencent.mm/.ui.LauncherUI 9066ea2 pid=9151
+  ACTIVITY com.android.settings/.Settings$UsbDetailsActivity a1c67ef pid=13751
+  ACTIVITY com.tencent.mm/.plugin.appbrand.ui.AppBrandUI 4e330fc pid=30550
+  ```
+  3. 通过进程号获取进程名称:例如：appbrand0
+  ```
+  C:\Users\PC>adb shell ps 30550
+  USER           PID  PPID     VSZ    RSS WCHAN            ADDR S NAME
+  u0_a12       30550   513 2020692 335464 0                   0 S com.tencent.mm:appbrand0
+  ```
+  4. 在启动参数中指定小程序的进程名称
+  ```python
+  desired_caps['chromeOptions']={'androidProcess': 'com.tencent.mm:appbrand0'}
+  ```
+  5. 使用元素定位找到并打开小程序，然后使用代码进入小程序，就跟普通的web自动化差不多了
+  ```python
+  self.driver.switch_to.context('WEBVIEW_com.tencent.mm:appbrand0')
+  ```
