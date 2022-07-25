@@ -111,13 +111,12 @@ C:\Users\PC>adb shell dumpsys activity | findstr "mResume"
   3. pip install weditor
   确认安装：cmd-  weditor --help
 - appium自带的
-## `Html5 webview元素定位工具的实现`
+- ucdevtool Uc开发者工具
 - chrome://inspect/#devices 需要fq
 - '下载使用'https://dev.ucweb.com/ uc开发者工具
   1. 需要在C:\Program Files\Appium Server GUI\resources\app\node_modules\appium\node_modules\appium-chromedriver\chromedriver\win加上一个与chrome内核相匹配的chromedriver,`打开公众号和打开小程序的chromedirver的版本可能是不同的，这样会导致打开h5页面和小程序不能同时进行。必须保证chrome版本都一样，才能实现一起运行。有的时候会抽风`
   2. 
 ## appium
-
 `注意`：
 - 重复执行测试用例
   1. pip install pytest -repeat
